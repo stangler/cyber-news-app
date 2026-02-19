@@ -48,7 +48,6 @@ function isBreaking(title: string, publishedAt: string): boolean {
   for (const keyword of BREAKING_KEYWORDS) {
     if (title.includes(keyword)) return true;
   }
-
   const publishedTime = new Date(publishedAt).getTime();
   const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
   return publishedTime > thirtyMinutesAgo;
@@ -76,10 +75,16 @@ export async function fetchAllNews(): Promise<NewsItem[]> {
 
   const results = await Promise.allSettled(
     RSS_FEEDS.map(async (url) => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const xml = await response.text();
-      return parser.parse(xml);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const xml = await response.text();
+        return parser.parse(xml);
+      } finally {
+        clearTimeout(timer);
+      }
     })
   );
 
@@ -120,5 +125,5 @@ export async function fetchAllNews(): Promise<NewsItem[]> {
   }
 
   allNews.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-  return enrichWithOgp(allNews);
+  return allNews;
 }

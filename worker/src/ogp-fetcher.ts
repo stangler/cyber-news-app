@@ -7,8 +7,10 @@ interface CacheEntry {
 
 const ogpCache = new Map<string, CacheEntry>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const FETCH_TIMEOUT = 10_000; // 10s
-const MAX_FETCH_CANDIDATES = 15;
+// const FETCH_TIMEOUT = 10_000; // 10s
+const FETCH_TIMEOUT = 3_000; // 3s
+// const MAX_FETCH_CANDIDATES = 15;
+const MAX_FETCH_CANDIDATES = 5;
 
 async function mapWithConcurrency<T, R>(
   items: T[],
