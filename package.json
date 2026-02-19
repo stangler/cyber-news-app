@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k -n worker,frontend -c cyan,magenta \"pnpm run --filter ./worker dev\" \"pnpm run --filter ./frontend dev\"",
+    "build": "pnpm run --filter ./worker build && pnpm run --filter ./frontend build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
